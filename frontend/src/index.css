@@ -162,4 +162,9 @@
   button {
     cursor: pointer;
   }
+
+  /* Keep the custom visibility toggle instead of Edge's built-in control. */
+  #password::-ms-reveal {
+    display: none;
+  }
 }

@@ -3,6 +3,8 @@ import { useEffect, useState } from "react"
 import { Sidebar, type Page } from "./components/layout/Sidebar"
 import { Topbar } from "./components/layout/Topbar"
 import { Dashboard } from "./pages/Dashboard"
+import { Login } from "./pages/Login"
+import { Navigate, Outlet, Route, Routes, useLocation, useNavigate } from "react-router"
 
 type Theme = "light" | "dark"
 
@@ -15,7 +17,11 @@ const pageTitles: Record<Page, string> = {
 }
 
 function App() {
-  const [page, setPage] = useState<Page>("dashboard")
+  // Temporary UI session only; real authentication will be handled by the API.
+  const [selectedCourse, setSelectedCourse] = useState<string | null>(() => sessionStorage.getItem("just-coding-course"))
+  const location = useLocation()
+  const navigate = useNavigate()
+  const page = location.pathname.split("/")[1] as Page
 
   const [theme, setTheme] = useState<Theme>(() => {
     return localStorage.getItem("just-coding-theme") === "dark"
@@ -33,34 +39,48 @@ function App() {
     setTheme((current) => current === "light" ? "dark" : "light")
   }
 
-  return (
+  function handleLogin(course: string) {
+    sessionStorage.setItem("just-coding-course", course)
+    setSelectedCourse(course)
+    navigate("/dashboard", { replace: true })
+  }
+
+  const workspace = selectedCourse ? (
     <div className="flex min-h-screen w-full flex-col bg-background text-foreground md:flex-row">
-      <Sidebar page={page} onNavigate={setPage} />
+      <Sidebar />
 
       <div className="flex min-w-0 flex-1 flex-col">
         <Topbar
-          title={pageTitles[page]}
+          title={`${selectedCourse} · ${pageTitles[page]}`}
           theme={theme}
           onToggleTheme={toggleTheme}
         />
 
         <main className="min-w-0 flex-1">
-          {page === "dashboard" ? (
-            <Dashboard />
-          ) : (
-            <div className="w-full px-6 py-8 sm:px-8">
-              <h1 className="text-2xl font-bold">
-                {pageTitles[page]}
-              </h1>
-
-              <p className="mt-3 text-sm text-muted-foreground">
-                此功能頁面將於下一階段開發。
-              </p>
-            </div>
-          )}
+          <Outlet />
         </main>
       </div>
     </div>
+  ) : <Navigate to="/login" replace />
+
+  return (
+    <Routes>
+      <Route path="/login" element={selectedCourse
+        ? <Navigate to="/dashboard" replace />
+        : <Login theme={theme} onToggleTheme={toggleTheme} onLogin={handleLogin} />} />
+      <Route element={workspace}>
+        <Route path="dashboard" element={<Dashboard />} />
+        {(Object.keys(pageTitles) as Page[]).filter((id) => id !== "dashboard").map((id) => (
+          <Route key={id} path={id} element={
+            <div className="w-full px-6 py-8 sm:px-8">
+              <h1 className="text-2xl font-bold">{pageTitles[id]}</h1>
+              <p className="mt-3 text-sm text-muted-foreground">此功能頁面將於下一階段開發。</p>
+            </div>
+          } />
+        ))}
+      </Route>
+      <Route path="*" element={<Navigate to={selectedCourse ? "/dashboard" : "/login"} replace />} />
+    </Routes>
   )
 }
 
