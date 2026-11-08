@@ -1,12 +1,4 @@
-
-import {
-  BookOpen,
-  CheckCircle2,
-  Clock3,
-  FileCode2,
-  Users,
-  type LucideIcon,
-} from "lucide-react"
+import { BookOpen, CheckCircle2, Clock3, FileCode2, Users, type LucideIcon } from "lucide-react"
 
 type Stat = {
   title: string
@@ -73,13 +65,9 @@ export function Dashboard() {
   return (
     <div className="w-full space-y-8 px-6 py-6 sm:px-8 sm:py-8">
       <div>
-        <p className="mb-2 text-xs font-semibold tracking-widest text-blue-500">
-          COURSE OVERVIEW
-        </p>
+        <p className="mb-2 text-xs font-semibold tracking-widest text-blue-500">COURSE OVERVIEW</p>
 
-        <h1 className="text-2xl font-bold tracking-tight">
-          儀表板
-        </h1>
+        <h1 className="text-2xl font-bold tracking-tight">儀表板</h1>
 
         <p className="mt-2 text-sm text-muted-foreground">
           歡迎回到 Just Coding，這裡可以查看課程作業與學生繳交概況。
@@ -96,16 +84,15 @@ export function Dashboard() {
               className="rounded-xl border border-border bg-card p-5 transition-colors hover:bg-accent/40"
             >
               <div className="mb-4 flex items-center justify-between gap-3">
-                <p className="text-sm text-muted-foreground">
-                  {item.title}
-                </p>
+                <p className="text-sm text-muted-foreground">{item.title}</p>
 
-                <Icon size={21} className={item.color} />
+                <Icon
+                  size={21}
+                  className={item.color}
+                />
               </div>
 
-              <p className="text-3xl font-bold tabular-nums">
-                {item.value}
-              </p>
+              <p className="text-3xl font-bold tabular-nums">{item.value}</p>
             </div>
           )
         })}
@@ -114,29 +101,22 @@ export function Dashboard() {
       <div className="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,3fr)_minmax(280px,1fr)]">
         <section className="min-w-0 rounded-xl border border-border bg-card p-6">
           <div className="mb-6 flex items-center gap-2">
-            <FileCode2 size={20} className="text-blue-500" />
+            <FileCode2
+              size={20}
+              className="text-blue-500"
+            />
 
-            <h2 className="font-semibold">
-              近期作業
-            </h2>
+            <h2 className="font-semibold">近期作業</h2>
           </div>
 
           <div className="w-full overflow-x-auto">
             <table className="w-full min-w-[560px] border-collapse text-left text-sm">
               <thead>
                 <tr className="border-b border-border text-muted-foreground">
-                  <th className="pb-4 pr-4 font-medium">
-                    作業名稱
-                  </th>
-                  <th className="pb-4 pr-4 font-medium">
-                    截止日期
-                  </th>
-                  <th className="pb-4 pr-4 font-medium">
-                    繳交人數
-                  </th>
-                  <th className="pb-4 font-medium">
-                    狀態
-                  </th>
+                  <th className="pb-4 pr-4 font-medium">作業名稱</th>
+                  <th className="pb-4 pr-4 font-medium">截止日期</th>
+                  <th className="pb-4 pr-4 font-medium">繳交人數</th>
+                  <th className="pb-4 font-medium">狀態</th>
                 </tr>
               </thead>
 
@@ -146,13 +126,9 @@ export function Dashboard() {
                     key={item.id}
                     className="border-b border-border last:border-0 hover:bg-accent/40"
                   >
-                    <td className="py-4 pr-4 font-medium">
-                      {item.name}
-                    </td>
+                    <td className="py-4 pr-4 font-medium">{item.name}</td>
 
-                    <td className="py-4 pr-4 text-muted-foreground">
-                      {item.deadline}
-                    </td>
+                    <td className="py-4 pr-4 text-muted-foreground">{item.deadline}</td>
 
                     <td className="py-4 pr-4">
                       {item.submitted} / {item.total}
@@ -177,36 +153,22 @@ export function Dashboard() {
         </section>
 
         <section className="min-w-0 rounded-xl border border-border bg-card p-6">
-          <h2 className="mb-6 font-semibold">
-            系統資訊
-          </h2>
+          <h2 className="mb-6 font-semibold">系統資訊</h2>
 
           <div className="space-y-5 text-sm">
             <div className="flex items-start justify-between gap-4">
-              <span className="text-muted-foreground">
-                系統名稱
-              </span>
-              <span className="text-right font-medium">
-                Just Coding
-              </span>
+              <span className="text-muted-foreground">系統名稱</span>
+              <span className="text-right font-medium">Just Coding</span>
             </div>
 
             <div className="flex items-start justify-between gap-4">
-              <span className="text-muted-foreground">
-                目前版本
-              </span>
-              <span className="text-right font-medium">
-                v0.2.0
-              </span>
+              <span className="text-muted-foreground">目前版本</span>
+              <span className="text-right font-medium">v0.2.0</span>
             </div>
 
             <div className="flex items-start justify-between gap-4">
-              <span className="text-muted-foreground">
-                開發環境
-              </span>
-              <span className="text-right font-medium">
-                React + Docker
-              </span>
+              <span className="text-muted-foreground">開發環境</span>
+              <span className="text-right font-medium">React + Docker</span>
             </div>
           </div>
 

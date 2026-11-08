@@ -16,9 +16,11 @@ export function useStudentSort<T>(items: T[], getStudent: (item: T) => StudentDr
     setDirection(key === next && direction === "ascending" ? "descending" : "ascending")
     setKey(next)
   }
-  const sorted = key ? [...items].sort((left, right) => {
-    const result = collator.compare(getStudent(left)[key], getStudent(right)[key])
-    return direction === "ascending" ? result : -result
-  }) : items
+  const sorted = key
+    ? [...items].sort((left, right) => {
+        const result = collator.compare(getStudent(left)[key], getStudent(right)[key])
+        return direction === "ascending" ? result : -result
+      })
+    : items
   return { key, direction, toggle, sorted }
 }

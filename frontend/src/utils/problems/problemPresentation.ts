@@ -15,7 +15,10 @@ export type PublicProblemView = {
 }
 
 // Project only student-visible fields; never pass hidden case data to the renderer.
-export function publicProblemView(problem: ProblemDraft & { id?: string }, cases: TestCase[]): PublicProblemView {
+export function publicProblemView(
+  problem: ProblemDraft & { id?: string },
+  cases: TestCase[],
+): PublicProblemView {
   return {
     code: problem.code,
     title: problem.title,
@@ -25,10 +28,25 @@ export function publicProblemView(problem: ProblemDraft & { id?: string }, cases
     memoryLimitMb: problem.memoryLimitMb,
     allowedLanguages: [...problem.allowedLanguages],
     specialRules: {
-      required: specialRuleCatalog.filter((item) => problem.specialRuleChecks.some((check) => check.feature === item.feature && check.mode === "required")).map((item) => item.label),
-      forbidden: specialRuleCatalog.filter((item) => problem.specialRuleChecks.some((check) => check.feature === item.feature && check.mode === "forbidden")).map((item) => item.label),
+      required: specialRuleCatalog
+        .filter((item) =>
+          problem.specialRuleChecks.some(
+            (check) => check.feature === item.feature && check.mode === "required",
+          ),
+        )
+        .map((item) => item.label),
+      forbidden: specialRuleCatalog
+        .filter((item) =>
+          problem.specialRuleChecks.some(
+            (check) => check.feature === item.feature && check.mode === "forbidden",
+          ),
+        )
+        .map((item) => item.label),
     },
-    examples: cases.filter((item) => item.problemId === problem.id && item.enabled && item.visibility === "public")
+    examples: cases
+      .filter(
+        (item) => item.problemId === problem.id && item.enabled && item.visibility === "public",
+      )
       .sort((left, right) => left.order - right.order)
       .map((item) => ({ name: item.name, input: item.input, expectedOutput: item.expectedOutput })),
   }

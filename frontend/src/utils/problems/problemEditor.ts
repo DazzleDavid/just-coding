@@ -1,7 +1,17 @@
 import type { ProblemDraft } from "../../types/problem"
 
 const tabFields = {
-  basic: ["code", "title", "difficulty", "tags", "points", "timeLimitMs", "memoryLimitMb", "allowedLanguages", "similarityCheck"],
+  basic: [
+    "code",
+    "title",
+    "difficulty",
+    "tags",
+    "points",
+    "timeLimitMs",
+    "memoryLimitMb",
+    "allowedLanguages",
+    "similarityCheck",
+  ],
   statement: ["statementMarkdown"],
   "special-rules": ["specialRuleIds", "specialRuleChecks"],
 } as const satisfies Record<string, readonly (keyof ProblemDraft)[]>
@@ -12,9 +22,15 @@ export function problemTabPatch(tab: string, draft: ProblemDraft): Partial<Probl
 }
 
 export function problemTabDirty(tab: string, draft: ProblemDraft, baseline: ProblemDraft) {
-  return JSON.stringify(problemTabPatch(tab, draft)) !== JSON.stringify(problemTabPatch(tab, baseline))
+  return (
+    JSON.stringify(problemTabPatch(tab, draft)) !== JSON.stringify(problemTabPatch(tab, baseline))
+  )
 }
 
-export function mergeProblemTab(tab: string, draft: ProblemDraft, saved: ProblemDraft): ProblemDraft {
+export function mergeProblemTab(
+  tab: string,
+  draft: ProblemDraft,
+  saved: ProblemDraft,
+): ProblemDraft {
   return { ...saved, ...problemTabPatch(tab, draft) }
 }
