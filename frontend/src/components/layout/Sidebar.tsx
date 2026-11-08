@@ -51,7 +51,7 @@ const menu: {
 
 export function Sidebar() {
   return (
-    <aside className="flex w-full shrink-0 flex-col border-b border-border bg-card md:min-h-screen md:w-60 md:border-r md:border-b-0">
+    <aside className="flex min-h-0 w-full shrink-0 flex-col border-b border-border bg-card md:h-full md:w-60 md:border-r md:border-b-0">
       <div className="flex min-h-[72px] items-center gap-3 border-b border-border px-4 py-4">
         <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-blue-600 text-white">
           <Code2 size={22} />
@@ -91,11 +91,10 @@ export function Sidebar() {
         })}
       </nav>
 
-      <div className="mt-auto hidden border-t border-border px-5 py-4 md:block">
-        <p className="text-xs text-muted-foreground">
-          Just Coding © 2026
-        </p>
-      </div>
+      <footer className="mt-auto shrink-0 border-t border-border px-5 py-3 text-xs leading-5 text-muted-foreground md:py-4">
+        <p>Copyright © {new Date().getFullYear()} J.D.I.哲哲.</p>
+        <p>版權所有。<span lang="en">All rights reserved.</span></p>
+      </footer>
     </aside>
   )
 }

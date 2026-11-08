@@ -13,7 +13,7 @@ export function Topbar({
   onToggleTheme,
 }: TopbarProps) {
   return (
-    <header className="flex min-h-[72px] items-center justify-between gap-4 border-b border-border bg-card px-4 sm:px-8">
+    <header className="flex min-h-[72px] shrink-0 items-center justify-between gap-4 border-b border-border bg-card px-4 sm:px-8">
       <div className="min-w-0">
         <p className="text-xs text-muted-foreground">
           Just Coding / Workspace

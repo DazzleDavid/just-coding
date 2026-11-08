@@ -5,6 +5,10 @@ import { Topbar } from "./components/layout/Topbar"
 import { Dashboard } from "./pages/Dashboard"
 import { Login } from "./pages/Login"
 import { Navigate, Outlet, Route, Routes, useLocation, useNavigate } from "react-router"
+import { StudentProvider } from "./components/students/StudentProvider"
+import { Students } from "./pages/Students"
+import { StudentDetail } from "./pages/StudentDetail"
+import { StudentImport } from "./pages/StudentImport"
 
 type Theme = "light" | "dark"
 
@@ -45,32 +49,36 @@ function App() {
     navigate("/dashboard", { replace: true })
   }
 
-  const workspace = selectedCourse ? (
-    <div className="flex min-h-screen w-full flex-col bg-background text-foreground md:flex-row">
+  const workspace = (
+    <div className="flex h-dvh w-full flex-col overflow-hidden bg-background text-foreground md:flex-row">
       <Sidebar />
 
-      <div className="flex min-w-0 flex-1 flex-col">
+      <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
         <Topbar
-          title={`${selectedCourse} · ${pageTitles[page]}`}
+          title={`${selectedCourse ? `${selectedCourse} · ` : ""}${pageTitles[page] ?? "工作區"}`}
           theme={theme}
           onToggleTheme={toggleTheme}
         />
 
-        <main className="min-w-0 flex-1">
+        <main tabIndex={0} aria-label="主要內容" className="min-h-0 min-w-0 flex-1 overflow-y-auto overscroll-contain focus-visible:outline-2 focus-visible:outline-inset focus-visible:outline-ring">
           <Outlet />
         </main>
       </div>
     </div>
-  ) : <Navigate to="/login" replace />
+  )
 
   return (
+    <StudentProvider>
     <Routes>
       <Route path="/login" element={selectedCourse
         ? <Navigate to="/dashboard" replace />
         : <Login theme={theme} onToggleTheme={toggleTheme} onLogin={handleLogin} />} />
       <Route element={workspace}>
         <Route path="dashboard" element={<Dashboard />} />
-        {(Object.keys(pageTitles) as Page[]).filter((id) => id !== "dashboard").map((id) => (
+        <Route path="students" element={<Students />} />
+        <Route path="students/import" element={<StudentImport />} />
+        <Route path="students/:id" element={<StudentDetail />} />
+        {(Object.keys(pageTitles) as Page[]).filter((id) => id !== "dashboard" && id !== "students").map((id) => (
           <Route key={id} path={id} element={
             <div className="w-full px-6 py-8 sm:px-8">
               <h1 className="text-2xl font-bold">{pageTitles[id]}</h1>
@@ -81,6 +89,7 @@ function App() {
       </Route>
       <Route path="*" element={<Navigate to={selectedCourse ? "/dashboard" : "/login"} replace />} />
     </Routes>
+    </StudentProvider>
   )
 }
 
