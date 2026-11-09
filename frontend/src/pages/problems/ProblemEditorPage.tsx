@@ -24,17 +24,6 @@ export function ProblemEditorPage() {
     )
   return (
     <div className="space-y-4 p-6 sm:p-8">
-      <header className="space-y-2">
-        <Link
-          to="/problems"
-          className="text-xs text-muted-foreground hover:text-primary"
-        >
-          題目管理 / 所有題目
-        </Link>
-        <h1 className="text-xl font-bold sm:text-2xl">
-          {problem ? `${problem.code} · ${problem.title}` : "新增題目"}
-        </h1>
-      </header>
       {loadError && (
         <p
           role="alert"

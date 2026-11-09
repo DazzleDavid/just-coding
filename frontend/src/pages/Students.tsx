@@ -48,31 +48,6 @@ export function Students() {
   }
   return (
     <div className="space-y-6 p-6 sm:p-8">
-      <div className="flex flex-wrap items-start justify-between gap-4">
-        <div>
-          <p className="mb-2 text-xs font-semibold tracking-widest text-primary">
-            STUDENT DIRECTORY
-          </p>
-          <h1 className="text-2xl font-bold">學生管理</h1>
-          <p className="mt-2 text-sm text-muted-foreground">管理學生資料、登入帳號與課程成員。</p>
-        </div>
-        <div className="flex flex-wrap gap-3">
-          <Link
-            to="/students/import"
-            className={secondaryButton}
-          >
-            <Upload size={17} />
-            Excel 匯入
-          </Link>
-          <button
-            onClick={() => setForm("new")}
-            className={primaryButton}
-          >
-            <Plus size={17} />
-            新增學生
-          </button>
-        </div>
-      </div>
       <StudentStats students={students} />
       <section
         aria-label="學生資料管理"
@@ -124,12 +99,30 @@ export function Students() {
                 <option key={name}>{name}</option>
               ))}
           </select>
-          <button
-            className={secondaryButton}
-            onClick={clearFilters}
-          >
-            清除篩選
-          </button>
+          <div className="flex flex-wrap items-center gap-2">
+            <button
+              type="button"
+              className={`${secondaryButton} whitespace-nowrap`}
+              onClick={clearFilters}
+            >
+              清除篩選
+            </button>
+            <Link
+              to="/students/import"
+              className={`${secondaryButton} whitespace-nowrap`}
+            >
+              <Upload size={17} />
+              Excel 匯入
+            </Link>
+            <button
+              type="button"
+              onClick={() => setForm("new")}
+              className={`${primaryButton} whitespace-nowrap`}
+            >
+              <Plus size={17} />
+              新增學生
+            </button>
+          </div>
         </div>
         <p className="px-5 py-3 text-xs text-muted-foreground">
           符合條件 {filtered.length} 人 · 啟用 {filtered.filter((student) => student.active).length}{" "}

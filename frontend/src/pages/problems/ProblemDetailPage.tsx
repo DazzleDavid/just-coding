@@ -22,13 +22,7 @@ export function ProblemDetailPage() {
     )
   return (
     <div className="space-y-6 p-6 sm:p-8">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <Link
-          to="/problems"
-          className="text-sm text-primary"
-        >
-          題目管理 / 所有題目
-        </Link>
+      <div className="flex flex-wrap items-center justify-end gap-3">
         <Link
           className={outlineButton}
           to={`/problems/${problem.id}/edit`}
@@ -36,7 +30,10 @@ export function ProblemDetailPage() {
           編輯題目
         </Link>
       </div>
-      <PublicProblemContent problem={publicProblemView(problem, data.testCases)} />
+      <PublicProblemContent
+        embedded
+        problem={publicProblemView(problem, data.testCases)}
+      />
     </div>
   )
 }

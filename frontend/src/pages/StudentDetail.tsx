@@ -35,38 +35,25 @@ export function StudentDetail() {
     new Date(value).toLocaleString("zh-TW", { timeZone: "Asia/Taipei" })
   return (
     <div className="space-y-6 p-6 sm:p-8">
-      <p className="text-sm text-muted-foreground">
-        <Link
-          to="/students"
-          className="text-primary hover:underline"
-        >
-          學生管理
-        </Link>{" "}
-        / 學生詳細資料
-      </p>
-      <div className="flex flex-wrap items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold">{student.name}</h1>
-          <p className="mt-2 font-mono text-sm text-muted-foreground">{student.studentNumber}</p>
-        </div>
-        <Link
-          to="/students"
-          className={secondaryButton}
-        >
-          <ArrowLeft size={17} />
-          返回學生列表
-        </Link>
-      </div>
       <section className="rounded-xl border border-border bg-card p-6">
         <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
           <h2 className="text-lg font-semibold">學生基本資料</h2>
-          <button
-            className={secondaryButton}
-            onClick={() => setEditing(true)}
-          >
-            <Pencil size={16} />
-            編輯資料
-          </button>
+          <div className="flex flex-wrap items-center gap-2">
+            <Link
+              to="/students"
+              className={secondaryButton}
+            >
+              <ArrowLeft size={17} />
+              返回學生列表
+            </Link>
+            <button
+              className={secondaryButton}
+              onClick={() => setEditing(true)}
+            >
+              <Pencil size={16} />
+              編輯資料
+            </button>
+          </div>
         </div>
         <dl className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
           {[

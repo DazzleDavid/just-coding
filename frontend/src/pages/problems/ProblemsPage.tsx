@@ -74,21 +74,6 @@ export function ProblemsPage() {
   }
   return (
     <div className="space-y-6 p-6 sm:p-8">
-      <div className="flex flex-wrap items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold">題目管理</h1>
-          <p className="mt-2 text-sm text-muted-foreground">
-            獨立管理題庫、評分規則與測資，供不同作業重複引用。
-          </p>
-        </div>
-        <Link
-          to="/problems/new"
-          className={button}
-        >
-          <Plus size={17} />
-          新增題目
-        </Link>
-      </div>
       {loadError && (
         <p
           role="alert"
@@ -173,17 +158,27 @@ export function ProblemsPage() {
               <option key={label}>{label}</option>
             ))}
           </select>
-          <button
-            className={outlineButton}
-            onClick={() => {
-              setQuery("")
-              setDifficulty("")
-              setTag("")
-              setPage(1)
-            }}
-          >
-            清除篩選
-          </button>
+          <div className="flex flex-wrap items-center gap-2">
+            <button
+              type="button"
+              className={`${outlineButton} whitespace-nowrap`}
+              onClick={() => {
+                setQuery("")
+                setDifficulty("")
+                setTag("")
+                setPage(1)
+              }}
+            >
+              清除篩選
+            </button>
+            <Link
+              to="/problems/new"
+              className={`${button} whitespace-nowrap`}
+            >
+              <Plus size={17} />
+              新增題目
+            </Link>
+          </div>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full min-w-[1200px] table-fixed border-collapse">

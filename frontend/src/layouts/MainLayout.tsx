@@ -1,48 +1,73 @@
-import { Suspense, useEffect, useRef } from "react"
+import { Suspense, useEffect, useRef, useState } from "react"
+import { Dialog } from "@base-ui/react/dialog"
 import { Outlet, useLocation } from "react-router"
 import { Sidebar } from "../components/layout/Sidebar"
 import { Topbar } from "../components/layout/Topbar"
 import { useWorkspace } from "../hooks/useWorkspace"
-import { navigation } from "./navigation"
+import { useProblems } from "../hooks/problems/useProblems"
+import { useStudents } from "../components/students/StudentStore"
+import { getPageHeading } from "./pageHeading"
 
 export function MainLayout() {
   const { theme, toggleTheme, selectedCourse } = useWorkspace()
   const location = useLocation()
   const main = useRef<HTMLElement>(null)
-  const pageTitle =
-    navigation.find((item) => location.pathname.split("/")[1] === item.id)?.title ?? "工作區"
+  const { data } = useProblems()
+  const { students } = useStudents()
+  const [sidebarExpanded, setSidebarExpanded] = useState(true)
+  const [mobileOpen, setMobileOpen] = useState(false)
+  const heading = getPageHeading(location.pathname, { ...data, students })
   useEffect(() => {
     main.current?.scrollTo({ top: 0 })
   }, [location.pathname])
+  useEffect(() => {
+    const desktop = window.matchMedia("(min-width: 768px)")
+    const closeDrawer = () => {
+      if (desktop.matches) setMobileOpen(false)
+    }
+    desktop.addEventListener("change", closeDrawer)
+    return () => desktop.removeEventListener("change", closeDrawer)
+  }, [])
   return (
-    <div className="flex h-dvh w-full flex-col overflow-hidden bg-background text-foreground md:flex-row">
-      <Sidebar />
-      <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
-        <Topbar
-          title={`${selectedCourse ? `${selectedCourse} · ` : ""}${pageTitle}`}
-          theme={theme}
-          onToggleTheme={toggleTheme}
+    <Dialog.Root
+      open={mobileOpen}
+      onOpenChange={setMobileOpen}
+    >
+      <div className="flex h-dvh w-full flex-col overflow-hidden bg-background text-foreground md:flex-row">
+        <Sidebar
+          expanded={sidebarExpanded}
+          onNavigate={() => setMobileOpen(false)}
         />
-        <main
-          ref={main}
-          tabIndex={0}
-          aria-label="主要內容"
-          className="min-h-0 min-w-0 flex-1 overflow-y-auto overscroll-contain focus-visible:outline-2 focus-visible:outline-inset focus-visible:outline-ring"
-        >
-          <Suspense
-            fallback={
-              <p
-                role="status"
-                className="p-8 text-sm text-muted-foreground"
-              >
-                載入頁面中…
-              </p>
-            }
+        <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
+          <Topbar
+            heading={heading}
+            course={selectedCourse}
+            theme={theme}
+            onToggleTheme={toggleTheme}
+            sidebarExpanded={sidebarExpanded}
+            onToggleSidebar={() => setSidebarExpanded((value) => !value)}
+          />
+          <main
+            ref={main}
+            tabIndex={0}
+            aria-label="主要內容"
+            className="min-h-0 min-w-0 flex-1 overflow-y-auto overscroll-contain focus-visible:outline-2 focus-visible:outline-inset focus-visible:outline-ring"
           >
-            <Outlet />
-          </Suspense>
-        </main>
+            <Suspense
+              fallback={
+                <p
+                  role="status"
+                  className="p-8 text-sm text-muted-foreground"
+                >
+                  載入頁面中…
+                </p>
+              }
+            >
+              <Outlet />
+            </Suspense>
+          </main>
+        </div>
       </div>
-    </div>
+    </Dialog.Root>
   )
 }

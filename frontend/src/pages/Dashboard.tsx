@@ -64,16 +64,6 @@ const assignments = [
 export function Dashboard() {
   return (
     <div className="w-full space-y-8 px-6 py-6 sm:px-8 sm:py-8">
-      <div>
-        <p className="mb-2 text-xs font-semibold tracking-widest text-blue-500">COURSE OVERVIEW</p>
-
-        <h1 className="text-2xl font-bold tracking-tight">儀表板</h1>
-
-        <p className="mt-2 text-sm text-muted-foreground">
-          歡迎回到 Just Coding，這裡可以查看課程作業與學生繳交概況。
-        </p>
-      </div>
-
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
         {stats.map((item) => {
           const Icon = item.icon

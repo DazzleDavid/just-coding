@@ -103,19 +103,6 @@ export function StudentImport() {
 
   return (
     <div className="space-y-6 p-6 sm:p-8">
-      <p className="text-sm text-muted-foreground">
-        <Link
-          className="text-primary hover:underline"
-          to="/students"
-        >
-          學生管理
-        </Link>{" "}
-        / Excel 批次匯入
-      </p>
-      <div>
-        <h1 className="text-2xl font-bold">Excel 批次匯入學生</h1>
-        <p className="mt-2 text-sm text-muted-foreground">透過 Excel 快速建立多筆學生資料。</p>
-      </div>
       <ol
         aria-label="匯入進度"
         className="grid grid-cols-2 gap-3 sm:grid-cols-4"
