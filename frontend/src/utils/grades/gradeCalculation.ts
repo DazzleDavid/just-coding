@@ -1,12 +1,25 @@
 import type { AssignmentProblem } from "../../types/assignmentProblem"
 import type { JudgeRun } from "../../types/judgeRun"
-import type { GradeInput, SubmissionView } from "../../types/grade"
+import type { Student } from "../../lib/students"
+import type {
+  GradeInput,
+  GradeState,
+  SubmissionView,
+  ProblemGrade,
+  StudentAssignmentGrade,
+  AssignmentGradeSummary,
+  StudentGradeSummary,
+} from "../../types/grade"
 
 export function assessmentKey(relation: AssignmentProblem): string | null {
   const snapshot = relation.publishedSnapshot
   if (!snapshot) return null
   // The key identifies the exact frozen assessment, without introducing content version counters.
   return JSON.stringify([relation.id, relation.points, snapshot])
+}
+
+function round(value: number) {
+  return Math.round((value + Number.EPSILON) * 10000) / 10000
 }
 
 export function submissionValidity(
@@ -66,6 +79,97 @@ export function getBestSubmission(views: SubmissionView[]): SubmissionView | und
     )[0]
 }
 
+function problemGrade(
+  input: GradeInput,
+  relation: AssignmentProblem,
+  submissions: SubmissionView[],
+): ProblemGrade {
+  const views = submissions
+  const valid = views.filter((item) => item.validity === null)
+  const best = getBestSubmission(valid)
+  const assignment = input.assignments.find((item) => item.id === relation.assignmentId)!
+  const state: GradeState =
+    assignment.status === "draft" || !relation.publishedSnapshot
+      ? "unavailable"
+      : best
+        ? "scored"
+        : !valid.length
+          ? "unsubmitted"
+          : valid.some((item) => !item.run || ["Pending", "Judging"].includes(item.run.status))
+            ? "pending"
+            : "error"
+  return {
+    relation,
+    problem:
+      relation.publishedSnapshot?.problem ??
+      input.problems.find((item) => item.id === relation.problemId),
+    submissions: views,
+    submitted: valid.length > 0,
+    completed: !!best?.run && best.run.score === best.run.maxScore,
+    score: best?.score ?? null,
+    best,
+    state,
+    lastSubmittedAt: valid
+      .map((item) => item.submission.submittedAt)
+      .sort((a, b) => Date.parse(b) - Date.parse(a))[0],
+  }
+}
+
+export function getSubmittedProblemCount(problems: ProblemGrade[]) {
+  return problems.filter((item) => item.submitted).length
+}
+export function getCompletedProblemCount(problems: ProblemGrade[]) {
+  return problems.filter((item) => item.completed).length
+}
+export function getSubmissionCount(problems: ProblemGrade[]) {
+  return problems.reduce(
+    (sum, item) => sum + item.submissions.filter((view) => view.validity === null).length,
+    0,
+  )
+}
+export function getAssignmentScore(problems: ProblemGrade[]): {
+  score: number | null
+  state: GradeState
+} {
+  if (!problems.length || problems.some((item) => item.state === "unavailable"))
+    return { score: null, state: "unavailable" }
+  if (!problems.some((item) => item.submitted)) return { score: null, state: "unsubmitted" }
+  if (problems.some((item) => item.state === "error")) return { score: null, state: "error" }
+  if (problems.some((item) => item.state === "pending")) return { score: null, state: "pending" }
+  // Missing questions contribute no points to a submitted assignment; no zero result is stored.
+  return {
+    score: round(problems.reduce((sum, item) => sum + (item.score ?? 0), 0)),
+    state: "scored",
+  }
+}
+
+export function getStudentGradeSummary(
+  student: Student,
+  own: StudentAssignmentGrade[],
+  now: number,
+): StudentGradeSummary {
+  const samples = own
+    .filter(
+      (row) =>
+        row.assignment.status === "published" &&
+        Date.parse(row.assignment.dueAt) <= now &&
+        row.maxScore > 0,
+    )
+    .flatMap((row) => (row.score !== null ? [row.score / row.maxScore] : []))
+  return {
+    student,
+    assignments: own,
+    started: own.filter((row) => row.submitted > 0).length,
+    submitted: own.reduce((sum, row) => sum + row.submitted, 0),
+    completed: own.reduce((sum, row) => sum + row.completed, 0),
+    submissionCount: own.reduce((sum, row) => sum + row.submissionCount, 0),
+    averageRate: samples.length
+      ? round((samples.reduce((sum, rate) => sum + rate, 0) / samples.length) * 100)
+      : null,
+    sampleSize: samples.length,
+  }
+}
+
 export function buildGradeBook(input: GradeInput) {
   const students = new Map(input.students.map((item) => [item.id, item]))
   const assignments = new Map(input.assignments.map((item) => [item.id, item]))
@@ -92,19 +196,73 @@ export function buildGradeBook(input: GradeInput) {
     return { ...view, validity: submissionValidity(input, view), score, counted: false }
   })
   const groups = new Map<string, SubmissionView[]>()
-  for (const view of submissions) {
-    const key = JSON.stringify([
+  const groupKey = (studentId: string, assignmentId: string, relationId: string) =>
+    JSON.stringify([studentId, assignmentId, relationId])
+  submissions.forEach((view) => {
+    const key = groupKey(
       view.submission.studentId,
       view.submission.assignmentId,
       view.submission.assignmentProblemId,
-    ])
+    )
     const group = groups.get(key) ?? []
     group.push(view)
     groups.set(key, group)
-  }
-  for (const group of groups.values()) {
-    const best = getBestSubmission(group)
-    if (best) best.counted = true
-  }
-  return { submissions }
+  })
+  const byAssignment: AssignmentGradeSummary[] = input.assignments.map((assignment) => {
+    const own = input.assignmentProblems
+      .filter((item) => item.assignmentId === assignment.id)
+      .sort((a, b) => a.order - b.order)
+    const maxScore = round(own.reduce((sum, item) => sum + item.points, 0))
+    const rows: StudentAssignmentGrade[] = input.students.map((student) => {
+      const problems = own.map((relation) =>
+        problemGrade(
+          input,
+          relation,
+          groups.get(groupKey(student.id, assignment.id, relation.id)) ?? [],
+        ),
+      )
+      problems.forEach((problem) => {
+        if (problem.best) problem.best.counted = true
+      })
+      return {
+        student,
+        assignment,
+        problems,
+        maxScore,
+        submitted: getSubmittedProblemCount(problems),
+        completed: getCompletedProblemCount(problems),
+        submissionCount: getSubmissionCount(problems),
+        ...getAssignmentScore(problems),
+        lastSubmittedAt: problems
+          .flatMap((item) => (item.lastSubmittedAt ? [item.lastSubmittedAt] : []))
+          .sort((a, b) => Date.parse(b) - Date.parse(a))[0],
+      }
+    })
+    const samples = rows.flatMap((row) =>
+      row.state === "scored" && row.score !== null && maxScore > 0
+        ? [row.score / maxScore]
+        : [],
+    )
+    return {
+      assignment,
+      rows,
+      totalProblems: own.length,
+      maxScore,
+      submittedStudents: rows.filter((row) => row.submitted > 0).length,
+      unsubmittedStudents: rows.filter((row) => row.submitted === 0).length,
+      submittedProblems: rows.reduce((sum, row) => sum + row.submitted, 0),
+      averageRate: samples.length
+        ? round((samples.reduce((sum, value) => sum + value, 0) / samples.length) * 100)
+        : null,
+      sampleSize: samples.length,
+      unresolvedStudents: rows.filter((row) => ["pending", "error"].includes(row.state)).length,
+    }
+  })
+  const byStudent: StudentGradeSummary[] = input.students.map((student) => {
+    const own = byAssignment.flatMap((item) =>
+      item.rows.filter((row) => row.student.id === student.id),
+    )
+    return getStudentGradeSummary(student, own, input.now)
+  })
+  return { assignments: byAssignment, students: byStudent, submissions }
 }

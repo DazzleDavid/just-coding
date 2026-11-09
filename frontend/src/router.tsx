@@ -6,8 +6,6 @@ import { Dashboard } from "./pages/Dashboard"
 import { Students } from "./pages/Students"
 import { StudentDetail } from "./pages/StudentDetail"
 import { StudentImport } from "./pages/StudentImport"
-import { EmptyState } from "./components/shared/EmptyState"
-import { SubmissionListPage, SubmissionDetailPage } from "./pages/submissions/LazySubmissionPages"
 import {
   AssignmentsPage,
   AssignmentFormPage,
@@ -23,6 +21,16 @@ import {
   ProblemGradingRedirect,
 } from "./components/shared/ProblemTestCasesRedirect"
 import { LegacyProblemRedirect } from "./components/shared/LegacyProblemRedirect"
+import { GradesLayout } from "./layouts/GradesLayout"
+import {
+  GradesOverviewPage,
+  StudentGradesPage,
+  StudentGradeDetailPage,
+  AssignmentGradesPage,
+  AssignmentGradeDetailPage,
+  SubmissionGradesPage,
+} from "./pages/grades/LazyGradePages"
+import { SubmissionListPage, SubmissionDetailPage } from "./pages/submissions/LazySubmissionPages"
 
 export const router = createBrowserRouter([
   {
@@ -65,12 +73,15 @@ export const router = createBrowserRouter([
           { path: "submissions/:submissionId", element: <SubmissionDetailPage /> },
           {
             path: "grades",
-            element: (
-              <EmptyState
-                title="成績管理"
-                description="此功能頁面將於下一階段開發。"
-              />
-            ),
+            element: <GradesLayout />,
+            children: [
+              { index: true, element: <GradesOverviewPage /> },
+              { path: "students", element: <StudentGradesPage /> },
+              { path: "students/:studentId", element: <StudentGradeDetailPage /> },
+              { path: "assignments", element: <AssignmentGradesPage /> },
+              { path: "assignments/:assignmentId", element: <AssignmentGradeDetailPage /> },
+              { path: "submissions", element: <SubmissionGradesPage /> },
+            ],
           },
         ],
       },

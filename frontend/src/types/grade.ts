@@ -41,3 +41,48 @@ export type SubmissionView = {
   score: number | null
   counted: boolean
 }
+export type ProblemGrade = {
+  relation: AssignmentProblem
+  problem?: Problem
+  submissions: SubmissionView[]
+  submitted: boolean
+  completed: boolean
+  score: number | null
+  best?: SubmissionView
+  state: GradeState
+  lastSubmittedAt?: string
+}
+export type StudentAssignmentGrade = {
+  student: Student
+  assignment: Assignment
+  problems: ProblemGrade[]
+  submitted: number
+  completed: number
+  submissionCount: number
+  score: number | null
+  maxScore: number
+  state: GradeState
+  lastSubmittedAt?: string
+}
+export type AssignmentGradeSummary = {
+  assignment: Assignment
+  rows: StudentAssignmentGrade[]
+  totalProblems: number
+  maxScore: number
+  submittedStudents: number
+  unsubmittedStudents: number
+  submittedProblems: number
+  averageRate: number | null
+  sampleSize: number
+  unresolvedStudents: number
+}
+export type StudentGradeSummary = {
+  student: Student
+  assignments: StudentAssignmentGrade[]
+  started: number
+  submitted: number
+  completed: number
+  submissionCount: number
+  averageRate: number | null
+  sampleSize: number
+}

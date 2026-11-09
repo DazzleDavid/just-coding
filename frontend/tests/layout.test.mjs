@@ -65,6 +65,23 @@ test("missing records and unknown routes retain a readable heading", () => {
   assert.equal(getPageHeading("/unknown", data).title, "工作區")
 })
 
+test("all grade routes identify their context and return to the correct parent", () => {
+  assert.equal(getPageHeading("/grades", data).title, "查看成績")
+  assert.equal(getPageHeading("/grades/students", data).title, "學生成績")
+  assert.equal(getPageHeading("/grades/students/student", data).title, "00123 · 王同學")
+  assert.equal(getPageHeading("/grades/students/student", data).parent.to, "/grades/students")
+  assert.equal(getPageHeading("/grades/assignments", data).title, "作業成績")
+  assert.equal(getPageHeading("/grades/assignments/assignment", data).title, "HW01 · 第一次作業")
+  assert.equal(
+    getPageHeading("/grades/assignments/assignment", data).parent.to,
+    "/grades/assignments",
+  )
+  assert.equal(getPageHeading("/grades/submissions", data).title, "提交成績")
+  assert.equal(getPageHeading("/grades/students/missing", data).title, "學生成績詳情")
+  assert.equal(getPageHeading("/grades/assignments/missing", data).title, "作業成績詳情")
+  assert.equal(getPageHeading("/submissions/example", data).title, "程式碼提交詳情")
+})
+
 test("submission details return to the submission list", () => {
   assert.deepEqual(getPageHeading("/submissions/example", data), {
     title: "程式碼提交詳情",

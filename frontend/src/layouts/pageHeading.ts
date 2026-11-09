@@ -50,13 +50,38 @@ export function getPageHeading(
     }
   }
 
+  if (module === "grades") {
+    const root = { title: "查看成績", to: "/grades" }
+    if (!id) return { title: "查看成績" }
+    if (id === "students") {
+      const student = data.students.find((item) => item.id === section)
+      return section
+        ? {
+            title: student ? `${student.studentNumber} · ${student.name}` : "學生成績詳情",
+            parent: { title: "學生成績", to: "/grades/students" },
+            section: "學生成績",
+          }
+        : { title: "學生成績", parent: root }
+    }
+    if (id === "assignments") {
+      const assignment = data.assignments.find((item) => item.id === section)
+      return section
+        ? {
+            title: assignment ? `${assignment.code} · ${assignment.title}` : "作業成績詳情",
+            parent: { title: "作業成績", to: "/grades/assignments" },
+            section: "作業成績",
+          }
+        : { title: "作業成績", parent: root }
+    }
+    return { title: "提交成績", parent: root }
+  }
   if (module === "submissions" && id)
     return { title: "程式碼提交詳情", parent: { title: "繳交紀錄", to: "/submissions" } }
 
   const titles: Record<string, string> = {
     dashboard: "儀表板",
     submissions: "繳交紀錄",
-    grades: "成績管理",
+    grades: "查看成績",
   }
   return { title: titles[module] ?? "工作區" }
 }

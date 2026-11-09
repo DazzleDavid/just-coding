@@ -35,7 +35,7 @@ export function SubmissionGradeTable({ rows }: { rows: SubmissionView[] }) {
         row.student ? (
           <Link
             className="text-primary hover:underline"
-            to={`/students/${row.student.id}`}
+            to={`/grades/students/${row.student.id}`}
           >
             {row.student.name}
           </Link>
@@ -52,7 +52,7 @@ export function SubmissionGradeTable({ rows }: { rows: SubmissionView[] }) {
         row.assignment ? (
           <Link
             className="text-primary hover:underline"
-            to={`/assignments/${row.assignment.id}`}
+            to={`/grades/assignments/${row.assignment.id}`}
           >
             {row.assignment.code} · {row.assignment.title}
           </Link>

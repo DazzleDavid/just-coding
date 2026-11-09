@@ -118,7 +118,7 @@ export function createSubmissionDemoWorkspace(now = Date.now()): GradeDemoData {
       draft: {
         code: window.code,
         title: window.title,
-        description: "供繳交紀錄與成績管理操作使用的虛構作業。",
+        description: "供繳交紀錄與查看成績操作使用的虛構作業。",
         startAt: new Date(now + window.start * day).toISOString(),
         dueAt: new Date(now + window.due * day).toISOString(),
       },

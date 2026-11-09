@@ -1,6 +1,6 @@
 import type { ReactNode } from "react"
 import type { JudgeStatus } from "../../types/judgeRun"
-import { input } from "../ui/styles"
+import { card, input } from "../ui/styles"
 
 const verdictLabels: Record<JudgeStatus, string> = {
   Pending: "等待評測",
@@ -27,6 +27,28 @@ export function GradeStatusBadge({ status }: { status?: JudgeStatus }) {
     <span className={`inline-flex rounded-full px-2.5 py-1 text-xs whitespace-nowrap ${color}`}>
       {status ? `${status} · ${verdictLabels[status]}` : "等待評測"}
     </span>
+  )
+}
+export function GradeStats({
+  items,
+}: {
+  items: { label: string; value: ReactNode; hint?: string }[]
+}) {
+  return (
+    <div
+      className={`grid grid-cols-2 gap-3 ${items.length === 5 ? "xl:grid-cols-5" : "xl:grid-cols-4"}`}
+    >
+      {items.map((item) => (
+        <div
+          className={card}
+          key={item.label}
+        >
+          <p className="text-sm text-muted-foreground">{item.label}</p>
+          <p className="mt-2 text-2xl font-semibold">{item.value}</p>
+          {item.hint && <p className="mt-1 text-xs text-muted-foreground">{item.hint}</p>}
+        </div>
+      ))}
+    </div>
   )
 }
 export function GradeSelect({

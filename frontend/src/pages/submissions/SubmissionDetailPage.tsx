@@ -34,7 +34,7 @@ export function SubmissionDetailPage() {
       <div className="flex flex-wrap items-center justify-between gap-3">
         <Link
           className="text-sm text-primary hover:underline"
-          to={`/submissions?student=${row.submission.studentId}&assignment=${row.submission.assignmentId}&problem=${row.submission.assignmentProblemId}`}
+          to={`/grades/submissions?student=${row.submission.studentId}&assignment=${row.submission.assignmentId}&problem=${row.submission.assignmentProblemId}`}
         >
           查看此題歷次提交
         </Link>

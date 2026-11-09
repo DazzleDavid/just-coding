@@ -18,7 +18,7 @@ export function MainLayout() {
   const gradeStore = useContext(GradeContext)
   const [sidebarExpanded, setSidebarExpanded] = useState(true)
   const [mobileOpen, setMobileOpen] = useState(false)
-  const demoWorkspace = /^\/(submissions)(\/|$)/.test(location.pathname)
+  const demoWorkspace = /^\/(grades|submissions)(\/|$)/.test(location.pathname)
     ? gradeStore?.workspace
     : undefined
   const heading = getPageHeading(location.pathname, {
