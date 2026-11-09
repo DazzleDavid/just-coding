@@ -19,7 +19,6 @@ export type ProblemDraft = {
 }
 export type Problem = ProblemDraft & {
   id: string
-  revision: number
   createdAt: string
   updatedAt: string
 }

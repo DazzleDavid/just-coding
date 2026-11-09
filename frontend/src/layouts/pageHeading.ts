@@ -9,7 +9,7 @@ export type PageHeading = {
 
 export function getPageHeading(
   pathname: string,
-  data: { problems: NamedRecord[]; students: StudentRecord[] },
+  data: { problems: NamedRecord[]; assignments: NamedRecord[]; students: StudentRecord[] },
 ): PageHeading {
   const [module, id, section] = pathname.split("/").filter(Boolean)
 
@@ -38,8 +38,19 @@ export function getPageHeading(
     }
   }
 
+  if (module === "assignments") {
+    if (!id) return { title: "作業管理" }
+    const parent = { title: "作業管理", to: "/assignments" }
+    if (id === "new") return { title: "新增作業", parent }
+    const assignment = data.assignments.find((item) => item.id === id)
+    return {
+      title: assignment ? `${assignment.code} · ${assignment.title}` : "作業詳情",
+      parent,
+      section: section === "edit" ? "編輯作業設定" : "作業詳情",
+    }
+  }
+
   const titles: Record<string, string> = {
-    assignments: "作業管理",
     dashboard: "儀表板",
     submissions: "繳交紀錄",
     grades: "成績管理",

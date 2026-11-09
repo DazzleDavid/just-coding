@@ -8,6 +8,11 @@ import { StudentDetail } from "./pages/StudentDetail"
 import { StudentImport } from "./pages/StudentImport"
 import { EmptyState } from "./components/shared/EmptyState"
 import {
+  AssignmentsPage,
+  AssignmentFormPage,
+  AssignmentDetailPage,
+} from "./pages/assignments/LazyAssignmentPages"
+import {
   ProblemsPage,
   ProblemDetailPage,
   ProblemEditorPage,
@@ -16,6 +21,7 @@ import {
   ProblemTestCasesRedirect,
   ProblemGradingRedirect,
 } from "./components/shared/ProblemTestCasesRedirect"
+import { LegacyProblemRedirect } from "./components/shared/LegacyProblemRedirect"
 
 export const router = createBrowserRouter([
   {
@@ -30,14 +36,14 @@ export const router = createBrowserRouter([
           { path: "students", element: <Students /> },
           { path: "students/import", element: <StudentImport /> },
           { path: "students/:id", element: <StudentDetail /> },
+          { path: "assignments", element: <AssignmentsPage /> },
+          { path: "assignments/new", element: <AssignmentFormPage /> },
+          { path: "assignments/:assignmentId", element: <AssignmentDetailPage /> },
+          { path: "assignments/:assignmentId/edit", element: <AssignmentFormPage /> },
+          { path: "assignments/:assignmentId/problems/new", element: <LegacyProblemRedirect /> },
           {
-            path: "assignments",
-            element: (
-              <EmptyState
-                title="作業管理"
-                description="此功能頁面將於下一階段開發。"
-              />
-            ),
+            path: "assignments/:assignmentId/problems/:problemId/*",
+            element: <LegacyProblemRedirect />,
           },
           { path: "problems", element: <ProblemsPage /> },
           { path: "problems/new", element: <ProblemEditorPage /> },

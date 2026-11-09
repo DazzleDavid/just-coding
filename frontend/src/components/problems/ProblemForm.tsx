@@ -227,7 +227,7 @@ export function ProblemForm({ problem }: { problem?: Problem }) {
                   已引用 {referenceCount}
                 </summary>
                 <div className="absolute top-full right-0 z-20 mt-2 w-72 max-w-[calc(100vw-3rem)] rounded-lg border border-border bg-card p-4 text-sm leading-6 text-foreground shadow-lg">
-                  修改會更新題庫及草稿作業；已發布作業保留發布時的版本。已封存且曾發布的作業也保留原快照。
+                  修改會更新題庫及草稿作業；已發布及曾發布後封存的作業保留發布當下的內容。
                 </div>
               </details>
             )}

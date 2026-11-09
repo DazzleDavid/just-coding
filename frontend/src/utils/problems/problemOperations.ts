@@ -49,10 +49,10 @@ export function applyProblemAction(source: AssignmentData, action: ProblemAction
       throw new Error("選取的特殊規則不存在，請重新選擇。")
     if (action.id) {
       const problem = findProblem(action.id)
-      Object.assign(problem, draft, { revision: problem.revision + 1, updatedAt: now })
+      Object.assign(problem, draft, { updatedAt: now })
     } else {
       id = crypto.randomUUID()
-      data.problems.push({ ...draft, id, revision: 1, createdAt: now, updatedAt: now })
+      data.problems.push({ ...draft, id, createdAt: now, updatedAt: now })
     }
   } else if (action.type === "copy-problem" || action.type === "delete-problem") {
     const problem = findProblem(action.id)
@@ -75,7 +75,6 @@ export function applyProblemAction(source: AssignmentData, action: ProblemAction
         id,
         code,
         title: `${problem.title}（副本）`,
-        revision: 1,
         createdAt: now,
         updatedAt: now,
       })
@@ -99,7 +98,6 @@ export function applyProblemAction(source: AssignmentData, action: ProblemAction
       ...otherCases,
       ...action.cases.map((item, order) => ({ ...item, name: item.name.trim(), order })),
     ]
-    problem.revision++
     problem.updatedAt = now
     id = problem.id
   } else if (action.type === "save-testcase") {
@@ -121,7 +119,6 @@ export function applyProblemAction(source: AssignmentData, action: ProblemAction
         order: data.testCases.filter((item) => item.problemId === problem.id).length,
       })
     }
-    problem.revision++
     problem.updatedAt = now
   } else {
     const item = data.testCases.find((item) => item.id === action.id)
@@ -157,7 +154,6 @@ export function applyProblemAction(source: AssignmentData, action: ProblemAction
         })
       }
     }
-    problem.revision++
     problem.updatedAt = now
   }
   return { data, id }

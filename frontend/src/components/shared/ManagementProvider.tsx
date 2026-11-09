@@ -5,7 +5,10 @@ import {
   loadAssignmentData,
   saveAssignmentData,
 } from "../../services/shared/managementStorage"
-import { applyProblemAction, type ProblemAction } from "../../utils/problems/problemOperations"
+import {
+  applyAssignmentAction,
+  type AssignmentAction,
+} from "../../utils/assignments/assignmentOperations"
 
 export function ManagementProvider({ children }: { children: ReactNode }) {
   const [initial] = useState(() => {
@@ -26,9 +29,9 @@ export function ManagementProvider({ children }: { children: ReactNode }) {
     const timer = window.setTimeout(() => setToast(null), 4500)
     return () => window.clearTimeout(timer)
   }, [toast])
-  function execute(action: ProblemAction, message = "已儲存變更。") {
+  function execute(action: AssignmentAction, message = "已儲存變更。") {
     if (initial.error) throw new Error(initial.error)
-    const result = applyProblemAction(current.current, action)
+    const result = applyAssignmentAction(current.current, action)
     saveAssignmentData(result.data)
     current.current = result.data
     setData(result.data)

@@ -80,7 +80,6 @@ function referencedFixture() {
     description: "",
     startAt: timestamp,
     dueAt: "2026-12-01T00:00:00Z",
-    allowedLanguages: ["Python 3"],
     status: "published",
     createdAt: timestamp,
     updatedAt: timestamp,
@@ -92,7 +91,6 @@ function referencedFixture() {
     order: 0,
     points: 100,
     publishedSnapshot: {
-      versionId: "fixed",
       capturedAt: timestamp,
       problem: structuredClone(data.problems[0]),
       testCases: structuredClone(data.testCases),
@@ -116,6 +114,8 @@ test("library CRUD and copying cases work independently of assignments", () => {
   assert.equal(deleted.testCases.length, 1)
   assert.ok(isAssignmentData(deleted))
   assert.equal(data.problems.length, 1)
+  assert.equal("revision" in data.problems[0], false)
+  assert.equal("revision" in copy.data.problems.find((item) => item.id === copy.id), false)
 })
 
 test("authoring validates a single language, limits, similarity and built-in rules", () => {
@@ -248,7 +248,7 @@ test("older data remains readable and default settings upgrade with a backup", (
 
 test("legacy migration preserves problem IDs, cases and fixed snapshots", () => {
   const { data, problemId } = referencedFixture()
-  const { code, tags, difficulty, revision, ...fields } = data.problems[0]
+  const { code, tags, difficulty, ...fields } = data.problems[0]
   const legacy = {
     version: 1,
     assignments: data.assignments,
@@ -260,4 +260,35 @@ test("legacy migration preserves problem IDs, cases and fixed snapshots", () => 
   assert.equal(migrated.testCases[0].input, caseDraft.input)
   assert.equal(migrated.assignmentProblems[0].publishedSnapshot.problem.id, problemId)
   assert.ok(isAssignmentData(migrated))
+})
+
+test("obsolete version counters and assignment languages are removed with a recoverable backup", () => {
+  const { data } = referencedFixture()
+  data.problems[0].revision = 7
+  data.assignments[0].allowedLanguages = ["C++"]
+  data.assignmentProblems[0].publishedSnapshot.versionId = "old-publication:r3"
+  data.assignmentProblems[0].publishedSnapshot.problem.revision = 3
+  const raw = JSON.stringify(data)
+  const values = new Map([[assignmentStorageKey, raw]])
+  globalThis.localStorage = {
+    getItem: (key) => values.get(key) ?? null,
+    setItem: (key, value) => values.set(key, value),
+  }
+  const expected = structuredClone(data)
+  delete expected.problems[0].revision
+  delete expected.assignments[0].allowedLanguages
+  delete expected.assignmentProblems[0].publishedSnapshot.versionId
+  delete expected.assignmentProblems[0].publishedSnapshot.problem.revision
+  const loaded = loadAssignmentData()
+  assert.deepEqual(loaded, expected)
+  assert.deepEqual(loaded.problems[0].allowedLanguages, ["Python 3"])
+  assert.equal(loaded.assignmentProblems[0].publishedSnapshot.testCases[0].input, caseDraft.input)
+  assert.equal(values.get(`${assignmentStorageKey}-before-metadata-removal`), raw)
+  assert.deepEqual(loadAssignmentData(), loaded)
+  values.set(assignmentStorageKey, raw)
+  globalThis.localStorage.setItem = () => {
+    throw new Error("QuotaExceeded")
+  }
+  assert.throws(loadAssignmentData, /儲存失敗/)
+  assert.equal(values.get(assignmentStorageKey), raw)
 })

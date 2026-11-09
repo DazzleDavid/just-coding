@@ -48,11 +48,7 @@ function isProblem(value: unknown): value is Problem {
     ]) &&
     Array.isArray(value.tags) &&
     Array.isArray(value.allowedLanguages) &&
-    ["points", "timeLimitMs", "memoryLimitMb", "revision"].every(
-      (field) => typeof value[field] === "number",
-    ) &&
-    Number.isInteger(value.revision) &&
-    Number(value.revision) > 0 &&
+    ["points", "timeLimitMs", "memoryLimitMb"].every((field) => typeof value[field] === "number") &&
     !Object.keys(validateProblem(value as Problem, [], undefined, { allowLegacyLanguages: true }))
       .length
   )
@@ -76,11 +72,20 @@ function isRule(value: unknown): value is SpecialRule {
   )
 }
 
-export function upgradeCodeCheckSettings(value: unknown) {
+export function upgradeManagementData(value: unknown) {
   const data = structuredClone(value)
   let changed = false
+  let removedMetadata = false
+  const removeMetadata = (item: Record<string, unknown>, field: string) => {
+    if (Object.hasOwn(item, field)) {
+      delete item[field]
+      changed = true
+      removedMetadata = true
+    }
+  }
   const upgradeProblem = (problem: unknown) => {
     if (!record(problem)) return
+    removeMetadata(problem, "revision")
     if (problem.similarityCheck === undefined) {
       problem.similarityCheck = { enabled: false, threshold: 80 }
       changed = true
@@ -95,6 +100,11 @@ export function upgradeCodeCheckSettings(value: unknown) {
     }
   }
   if (record(data) && data.version === 2) {
+    if (Array.isArray(data.assignments)) {
+      data.assignments.forEach((assignment) => {
+        if (record(assignment)) removeMetadata(assignment, "allowedLanguages")
+      })
+    }
     if (data.specialRules === undefined) {
       data.specialRules = []
       changed = true
@@ -103,6 +113,7 @@ export function upgradeCodeCheckSettings(value: unknown) {
     if (Array.isArray(data.assignmentProblems))
       data.assignmentProblems.forEach((relation) => {
         if (record(relation) && record(relation.publishedSnapshot)) {
+          removeMetadata(relation.publishedSnapshot, "versionId")
           upgradeProblem(relation.publishedSnapshot.problem)
           if (relation.publishedSnapshot.specialRules === undefined) {
             relation.publishedSnapshot.specialRules = []
@@ -111,7 +122,7 @@ export function upgradeCodeCheckSettings(value: unknown) {
         }
       })
   }
-  return { data, changed }
+  return { data, changed, removedMetadata }
 }
 
 export function isAssignmentData(value: unknown): value is AssignmentData {
@@ -139,7 +150,6 @@ export function isAssignmentData(value: unknown): value is AssignmentData {
           "createdAt",
           "updatedAt",
         ]) &&
-        Array.isArray(item.allowedLanguages) &&
         ["draft", "published", "archived"].includes(String(item.status)),
     )
   )
@@ -202,7 +212,6 @@ export function isAssignmentData(value: unknown): value is AssignmentData {
     if (!snapshot) return true
     return (
       record(snapshot) &&
-      typeof snapshot.versionId === "string" &&
       typeof snapshot.capturedAt === "string" &&
       Number.isFinite(Date.parse(snapshot.capturedAt)) &&
       isProblem(snapshot.problem) &&
@@ -247,7 +256,6 @@ export function migrateAssignmentData(value: unknown): AssignmentData {
       code: `P${String(index + 1).padStart(4, "0")}`,
       difficulty: "easy",
       tags: [],
-      revision: 1,
       similarityCheck: { enabled: false, threshold: 80 },
       specialRuleIds: [],
       specialRuleChecks: [],
@@ -275,30 +283,30 @@ export function migrateAssignmentData(value: unknown): AssignmentData {
     const problem = problems.find((item) => item.id === relation.problemId)!
     if (assignment && assignment.status !== "draft")
       relation.publishedSnapshot = {
-        versionId: `legacy-${relation.id}`,
         capturedAt: assignment.updatedAt,
         problem: structuredClone(problem),
         testCases: structuredClone(data.testCases.filter((item) => item.problemId === problem.id)),
         specialRules: [],
       }
   }
-  if (!isAssignmentData(data)) throw new Error("舊版資料驗證失敗，已保留原始資料並停止寫入。")
-  return data
+  const migrated = upgradeManagementData(data).data
+  if (!isAssignmentData(migrated)) throw new Error("舊版資料驗證失敗，已保留原始資料並停止寫入。")
+  return migrated
 }
 
 export function loadAssignmentData(): AssignmentData {
   const raw = localStorage.getItem(assignmentStorageKey)
   if (raw !== null) {
-    const upgraded = upgradeCodeCheckSettings(JSON.parse(raw))
+    const upgraded = upgradeManagementData(JSON.parse(raw))
     if (!isAssignmentData(upgraded.data))
       throw new Error("管理資料格式不相容或損壞，已停止寫入以保留原始資料。")
     if (upgraded.changed) {
       try {
-        const backup = `${assignmentStorageKey}-before-built-in-rules`
+        const backup = `${assignmentStorageKey}-${upgraded.removedMetadata ? "before-metadata-removal" : "before-built-in-rules"}`
         if (localStorage.getItem(backup) === null) localStorage.setItem(backup, raw)
         saveAssignmentData(upgraded.data)
       } catch {
-        throw new Error("程式碼檢查設定升級儲存失敗，原始資料已保留。")
+        throw new Error("管理資料格式調整儲存失敗，原始資料已保留。")
       }
     }
     return upgraded.data

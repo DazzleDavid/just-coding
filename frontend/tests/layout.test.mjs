@@ -16,6 +16,7 @@ await writeFile(target, outputText)
 const { getPageHeading } = await import(pathToFileURL(target).href)
 const data = {
   problems: [{ id: "problem", code: "P0001", title: "A + B" }],
+  assignments: [{ id: "assignment", code: "HW01", title: "第一次作業" }],
   students: [{ id: "student", studentNumber: "00123", name: "王同學" }],
 }
 
@@ -50,6 +51,12 @@ test("problem editor moves the entity title to the topbar while public detail ke
   assert.equal(getPageHeading("/problems/problem/edit", data).title, "P0001 · A + B")
   assert.equal(getPageHeading("/problems/problem/edit", data).section, "編輯題目")
   assert.equal(getPageHeading("/problems/problem/details", data).title, "題目詳情")
+})
+
+test("assignment child pages identify the selected assignment and editing context", () => {
+  assert.equal(getPageHeading("/assignments/new", data).title, "新增作業")
+  assert.equal(getPageHeading("/assignments/assignment", data).title, "HW01 · 第一次作業")
+  assert.equal(getPageHeading("/assignments/assignment/edit", data).section, "編輯作業設定")
 })
 
 test("missing records and unknown routes retain a readable heading", () => {
