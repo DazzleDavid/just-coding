@@ -2,6 +2,7 @@ import { useEffect, useState } from "react"
 import { Outlet } from "react-router"
 import { StudentProvider } from "./components/students/StudentProvider"
 import { ManagementProvider } from "./components/shared/ManagementProvider"
+import { GradeProvider } from "./components/grades/GradeProvider"
 import { WorkspaceContext } from "./hooks/useWorkspace"
 
 function App() {
@@ -34,7 +35,9 @@ function App() {
     >
       <StudentProvider>
         <ManagementProvider>
-          <Outlet />
+          <GradeProvider>
+            <Outlet />
+          </GradeProvider>
         </ManagementProvider>
       </StudentProvider>
     </WorkspaceContext.Provider>

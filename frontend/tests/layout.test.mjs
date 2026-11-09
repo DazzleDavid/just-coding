@@ -64,3 +64,10 @@ test("missing records and unknown routes retain a readable heading", () => {
   assert.equal(getPageHeading("/problems/missing/edit", data).title, "編輯題目")
   assert.equal(getPageHeading("/unknown", data).title, "工作區")
 })
+
+test("submission details return to the submission list", () => {
+  assert.deepEqual(getPageHeading("/submissions/example", data), {
+    title: "程式碼提交詳情",
+    parent: { title: "繳交紀錄", to: "/submissions" },
+  })
+})

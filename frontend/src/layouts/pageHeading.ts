@@ -50,6 +50,9 @@ export function getPageHeading(
     }
   }
 
+  if (module === "submissions" && id)
+    return { title: "程式碼提交詳情", parent: { title: "繳交紀錄", to: "/submissions" } }
+
   const titles: Record<string, string> = {
     dashboard: "儀表板",
     submissions: "繳交紀錄",

@@ -7,6 +7,7 @@ import { Students } from "./pages/Students"
 import { StudentDetail } from "./pages/StudentDetail"
 import { StudentImport } from "./pages/StudentImport"
 import { EmptyState } from "./components/shared/EmptyState"
+import { SubmissionListPage, SubmissionDetailPage } from "./pages/submissions/LazySubmissionPages"
 import {
   AssignmentsPage,
   AssignmentFormPage,
@@ -60,15 +61,8 @@ export const router = createBrowserRouter([
               />
             ),
           },
-          {
-            path: "submissions",
-            element: (
-              <EmptyState
-                title="繳交紀錄"
-                description="此功能頁面將於下一階段開發。"
-              />
-            ),
-          },
+          { path: "submissions", element: <SubmissionListPage /> },
+          { path: "submissions/:submissionId", element: <SubmissionDetailPage /> },
           {
             path: "grades",
             element: (

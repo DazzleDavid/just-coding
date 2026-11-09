@@ -1,4 +1,4 @@
-import { Suspense, useEffect, useRef, useState } from "react"
+import { Suspense, useContext, useEffect, useRef, useState } from "react"
 import { Dialog } from "@base-ui/react/dialog"
 import { Outlet, useLocation } from "react-router"
 import { Sidebar } from "../components/layout/Sidebar"
@@ -7,6 +7,7 @@ import { useWorkspace } from "../hooks/useWorkspace"
 import { useProblems } from "../hooks/problems/useProblems"
 import { useStudents } from "../components/students/StudentStore"
 import { getPageHeading } from "./pageHeading"
+import { GradeContext } from "../hooks/grades/useGrades"
 
 export function MainLayout() {
   const { theme, toggleTheme, selectedCourse } = useWorkspace()
@@ -14,9 +15,16 @@ export function MainLayout() {
   const main = useRef<HTMLElement>(null)
   const { data } = useProblems()
   const { students } = useStudents()
+  const gradeStore = useContext(GradeContext)
   const [sidebarExpanded, setSidebarExpanded] = useState(true)
   const [mobileOpen, setMobileOpen] = useState(false)
-  const heading = getPageHeading(location.pathname, { ...data, students })
+  const demoWorkspace = /^\/(submissions)(\/|$)/.test(location.pathname)
+    ? gradeStore?.workspace
+    : undefined
+  const heading = getPageHeading(location.pathname, {
+    ...(demoWorkspace?.management ?? data),
+    students: demoWorkspace?.students ?? students,
+  })
   useEffect(() => {
     main.current?.scrollTo({ top: 0 })
   }, [location.pathname])
