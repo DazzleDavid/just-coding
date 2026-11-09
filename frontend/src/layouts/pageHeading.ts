@@ -79,6 +79,7 @@ export function getPageHeading(
     return { title: "程式碼提交詳情", parent: { title: "繳交紀錄", to: "/submissions" } }
 
   const titles: Record<string, string> = {
+    exports: "匯出成績",
     dashboard: "儀表板",
     submissions: "繳交紀錄",
     grades: "查看成績",

@@ -26,6 +26,7 @@ test("list pages retain their titles in the topbar", () => {
     ["/students", "學生管理"],
     ["/problems", "題目管理"],
     ["/assignments", "作業管理"],
+    ["/exports", "匯出成績"],
   ]) {
     assert.deepEqual(getPageHeading(path, data), { title })
   }

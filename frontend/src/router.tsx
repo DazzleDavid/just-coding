@@ -32,6 +32,8 @@ import {
 } from "./pages/grades/LazyGradePages"
 import { SubmissionListPage, SubmissionDetailPage } from "./pages/submissions/LazySubmissionPages"
 
+import { GradeExportPage } from "./pages/exports/LazyExportPages"
+
 export const router = createBrowserRouter([
   {
     element: <App />,
@@ -71,6 +73,7 @@ export const router = createBrowserRouter([
           },
           { path: "submissions", element: <SubmissionListPage /> },
           { path: "submissions/:submissionId", element: <SubmissionDetailPage /> },
+          { path: "exports", element: <GradeExportPage /> },
           {
             path: "grades",
             element: <GradesLayout />,
