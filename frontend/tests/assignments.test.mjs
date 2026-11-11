@@ -7,6 +7,7 @@ import ts from "typescript"
 
 const output = resolve("node_modules/.tmp/assignment-tests-v2")
 const modules = [
+  "lib/uuid",
   "types/assignment",
   "types/problem",
   "types/testCase",

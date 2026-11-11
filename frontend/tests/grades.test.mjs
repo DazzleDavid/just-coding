@@ -11,6 +11,7 @@ import { createMemoryRouter, RouterProvider } from "react-router"
 
 const output = resolve("node_modules/.tmp/grade-tests")
 const modules = [
+  "lib/uuid",
   "types/assignment",
   "types/judgeRun",
   "types/exports",

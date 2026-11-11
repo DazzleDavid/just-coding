@@ -9,14 +9,14 @@ import * as XLSX from "xlsx"
 
 const output = resolve("node_modules/.tmp/student-tests")
 await mkdir(output, { recursive: true })
-for (const name of ["students", "studentImport"]) {
+for (const name of ["uuid", "students", "studentImport"]) {
   const source = await readFile(`src/lib/${name}.ts`, "utf8")
   const { outputText } = ts.transpileModule(source, {
     compilerOptions: { module: ts.ModuleKind.ESNext, target: ts.ScriptTarget.ES2023 },
   })
   await writeFile(
     `${output}/${name}.mjs`,
-    outputText.replace('from "./students"', 'from "./students.mjs"'),
+    outputText.replace(/from "(\.\/[^"\n]+)"/g, 'from "$1.mjs"'),
   )
 }
 const { validateStudent, seedStudents, createStudent, normalizeStudent } = await import(

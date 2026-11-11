@@ -1,3 +1,5 @@
+import { createUuid } from "./uuid"
+
 export type StudentDraft = {
   studentNumber: string
   name: string
@@ -58,7 +60,7 @@ export function createStudent(draft: StudentDraft): Student {
   const now = new Date().toISOString()
   return {
     ...normalizeStudent(draft),
-    id: crypto.randomUUID(),
+    id: createUuid(),
     active: true,
     createdAt: now,
     updatedAt: now,

@@ -10,6 +10,7 @@ import { createMemoryRouter, RouterProvider } from "react-router"
 
 const output = resolve("node_modules/.tmp/grade-view-tests")
 const modules = [
+  "lib/uuid",
   "types/assignment",
   "types/judgeRun",
   "data/problems/specialRuleCatalog",

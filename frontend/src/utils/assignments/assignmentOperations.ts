@@ -1,3 +1,4 @@
+import { createUuid } from "../../lib/uuid"
 import type { AssignmentData } from "../../services/assignments/assignmentStorage"
 import type {
   AssignmentDraft,
@@ -85,7 +86,7 @@ export function applyAssignmentAction(
         })
       } else if (action.id) Object.assign(editable(action.id), draft)
       else {
-        id = crypto.randomUUID()
+        id = createUuid()
         data.assignments.push({ ...draft, id, status: "draft", createdAt: now, updatedAt: now })
       }
       if (action.problemConfiguration !== undefined) {
@@ -101,7 +102,7 @@ export function applyAssignmentAction(
             (relation) => relation.assignmentId === id && relation.problemId === item.problemId,
           )
           return {
-            id: previous?.id ?? crypto.randomUUID(),
+            id: previous?.id ?? createUuid(),
             assignmentId: id,
             problemId: item.problemId,
             order,
@@ -162,7 +163,7 @@ export function applyAssignmentAction(
       let suffix = 2
       while (data.assignments.some((item) => item.code.toLowerCase() === code.toLowerCase()))
         code = `${original.code}-COPY${suffix++}`
-      id = crypto.randomUUID()
+      id = createUuid()
       data.assignments.push({
         ...original,
         id,
@@ -176,7 +177,7 @@ export function applyAssignmentAction(
         .filter((item) => item.assignmentId === original.id)
         .forEach((item) =>
           data.assignmentProblems.push({
-            id: crypto.randomUUID(),
+            id: createUuid(),
             assignmentId: id,
             problemId: item.problemId,
             order: item.order,
@@ -205,7 +206,7 @@ export function applyAssignmentAction(
         )
           return
         const problem = data.problems.find((item) => item.id === problemId)!
-        id = crypto.randomUUID()
+        id = createUuid()
         data.assignmentProblems.push({
           id,
           assignmentId: action.assignmentId,

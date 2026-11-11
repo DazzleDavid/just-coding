@@ -1,3 +1,4 @@
+import { createUuid } from "../../lib/uuid"
 import type { AssignmentData } from "../../services/shared/managementStorage"
 import type { ProblemDraft } from "../../types/problem"
 import type { TestCase, TestCaseDraft } from "../../types/testCase"
@@ -51,7 +52,7 @@ export function applyProblemAction(source: AssignmentData, action: ProblemAction
       const problem = findProblem(action.id)
       Object.assign(problem, draft, { updatedAt: now })
     } else {
-      id = crypto.randomUUID()
+      id = createUuid()
       data.problems.push({ ...draft, id, createdAt: now, updatedAt: now })
     }
   } else if (action.type === "copy-problem" || action.type === "delete-problem") {
@@ -65,7 +66,7 @@ export function applyProblemAction(source: AssignmentData, action: ProblemAction
       data.problems = data.problems.filter((item) => item.id !== problem.id)
       data.testCases = data.testCases.filter((item) => item.problemId !== problem.id)
     } else {
-      id = crypto.randomUUID()
+      id = createUuid()
       let code = `${problem.code}-COPY`
       let suffix = 2
       while (data.problems.some((item) => item.code.toLowerCase() === code.toLowerCase()))
@@ -80,7 +81,7 @@ export function applyProblemAction(source: AssignmentData, action: ProblemAction
       })
       data.testCases
         .filter((item) => item.problemId === problem.id)
-        .forEach((item) => data.testCases.push({ ...item, id: crypto.randomUUID(), problemId: id }))
+        .forEach((item) => data.testCases.push({ ...item, id: createUuid(), problemId: id }))
     }
   } else if (action.type === "save-testcases") {
     const problem = findProblem(action.problemId)
@@ -111,7 +112,7 @@ export function applyProblemAction(source: AssignmentData, action: ProblemAction
       if (!item) throw new Error("找不到測資。")
       Object.assign(item, draft)
     } else {
-      id = crypto.randomUUID()
+      id = createUuid()
       data.testCases.push({
         ...draft,
         id,
@@ -126,7 +127,7 @@ export function applyProblemAction(source: AssignmentData, action: ProblemAction
     const problem = findProblem(item.problemId)
     if (action.type === "toggle-testcase") item.enabled = !item.enabled
     else if (action.type === "copy-testcase") {
-      id = crypto.randomUUID()
+      id = createUuid()
       data.testCases.push({
         ...item,
         id,
